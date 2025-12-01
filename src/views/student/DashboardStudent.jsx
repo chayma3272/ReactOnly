@@ -21,13 +21,13 @@
  * - activeMenu: Détermine quelle section est actuellement affichée
  *   Valeurs possibles: 'dashboard', 'courses', 'analytics', 'settings'
  */
-
 import React, { useState } from 'react'
 import StudentMenuBar from '../../components/StudentMenuBar'
 import StudentHeader from '../../components/StudentHeader'
 import CoursesStudent from './CoursesStudent'
 import SettingsStudent from './SettingsStudent'
 import AnalyticsDashboard from './AnalyticsDashboard'
+
 
 export default function DashboardStudent() {
   /**
