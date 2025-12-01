@@ -4,7 +4,8 @@ import { Link, useNavigate } from 'react-router-dom';
 export default function Authentification() {
   const [formData, setFormData] = useState({
     email: '',
-    password: ''
+    password: '',
+    role: 'student' // Par défaut: étudiant
   });
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
@@ -55,11 +56,22 @@ export default function Authentification() {
       // Simuler une requête API
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Ici vous feriez votre appel API réel
+      // Ici vous feriez votre appel API réel qui retourne le rôle de l'utilisateur
       console.log('Connexion réussie:', formData);
       
-      // Redirection après connexion réussie
-      navigate('/');
+      // Sauvegarder le rôle dans localStorage pour maintenir la session
+      localStorage.setItem('userRole', formData.role);
+      localStorage.setItem('userEmail', formData.email);
+      
+      // Redirection selon le rôle
+      if (formData.role === 'teacher') {
+        // Si c'est un enseignant, rediriger vers le dashboard enseignant
+        navigate('/teacher/dashboard');
+      } else {
+        // Si c'est un étudiant, rediriger vers le dashboard étudiant
+        navigate('/student/dashboard');
+      }
+      
     } catch (error) {
       console.error('Erreur de connexion:', error);
       setErrors({ submit: 'Erreur de connexion. Veuillez réessayer.' });
@@ -93,6 +105,47 @@ export default function Authentification() {
                 )}
                 
                 <form onSubmit={handleSubmit}>
+                  {/* Sélection du rôle */}
+                  <div className="mb-4">
+                    <label className="form-label fw-semibold">Se connecter en tant que :</label>
+                    <div className="d-flex gap-3">
+                      <div className="form-check flex-fill">
+                        <input
+                          className="form-check-input"
+                          type="radio"
+                          name="role"
+                          id="roleStudent"
+                          value="student"
+                          checked={formData.role === 'student'}
+                          onChange={handleChange}
+                        />
+                        <label className="form-check-label w-100" htmlFor="roleStudent">
+                          <div className="border rounded p-3 text-center" style={{ cursor: 'pointer' }}>
+                            <i className="bi bi-mortarboard-fill fs-3 text-success d-block mb-2"></i>
+                            <strong>Étudiant</strong>
+                          </div>
+                        </label>
+                      </div>
+                      <div className="form-check flex-fill">
+                        <input
+                          className="form-check-input"
+                          type="radio"
+                          name="role"
+                          id="roleTeacher"
+                          value="teacher"
+                          checked={formData.role === 'teacher'}
+                          onChange={handleChange}
+                        />
+                        <label className="form-check-label w-100" htmlFor="roleTeacher">
+                          <div className="border rounded p-3 text-center" style={{ cursor: 'pointer' }}>
+                            <i className="bi bi-person-workspace fs-3 text-primary d-block mb-2"></i>
+                            <strong>Enseignant</strong>
+                          </div>
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+
                   <div className="mb-3">
                     <input
                       type="email"
@@ -119,7 +172,9 @@ export default function Authentification() {
                   
                   <button 
                     type="submit" 
-                    className="btn btn-primary btn-lg w-100 mb-3"
+                    className={`btn btn-lg w-100 mb-3 ${
+                      formData.role === 'teacher' ? 'btn-primary' : 'btn-success'
+                    }`}
                     disabled={isLoading}
                   >
                     {isLoading ? (
@@ -128,7 +183,9 @@ export default function Authentification() {
                         Connexion...
                       </>
                     ) : (
-                      'Se Connecter'
+                      <>
+                        Se Connecter en tant que {formData.role === 'teacher' ? 'Enseignant' : 'Étudiant'}
+                      </>
                     )}
                   </button>
                   
